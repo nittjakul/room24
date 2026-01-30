@@ -5,42 +5,42 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Scout Room 24</title>
     <style>
+        /* CSS ปรับให้สวยเหมือนแอป */
         * { box-sizing: border-box; }
         body { font-family: -apple-system, sans-serif; background-color: #fafafa; margin: 0; padding-bottom: 90px; }
         header { background: #fff; padding: 15px; text-align: center; border-bottom: 1px solid #dbdbdb; position: sticky; top: 0; z-index: 100; }
+        header h1 { font-size: 18px; margin: 0; color: #5d4037; }
         #feed { width: 100%; max-width: 500px; margin: 0 auto; }
-        .post { background: #fff; border-bottom: 1px solid #efefef; margin-bottom: 15px; }
-        .post img { width: 100%; display: block; }
-        .post-content { padding: 12px; }
-        
-        /* Floating Button */
+        .post { background: #fff; border-bottom: 1px solid #efefef; margin-bottom: 15px; animation: fadeIn 0.5s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .post img { width: 100%; display: block; background: #eee; min-height: 200px; }
+        .post-content { padding: 15px; }
         .btn-open-modal {
             position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
-            width: 60px; height: 60px; background: #2e7d32; color: white;
-            border-radius: 50%; border: none; font-size: 35px; cursor: pointer; z-index: 1000;
+            width: 65px; height: 65px; background: #2e7d32; color: white;
+            border-radius: 50%; border: none; font-size: 40px; cursor: pointer; z-index: 1000;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         }
-
-        /* Modal GUI */
         .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); }
-        .modal-content { background: white; width: 100%; position: absolute; bottom: 0; padding: 25px; border-radius: 20px 20px 0 0; text-align: center; }
-        textarea { width: 100%; height: 100px; margin: 15px 0; border: 1px solid #dbdbdb; border-radius: 8px; padding: 12px; font-size: 16px; }
-        .btn-post { background: #0095f6; color: white; border: none; padding: 12px; border-radius: 8px; width: 100%; font-size: 16px; font-weight: bold; cursor: pointer; }
+        .modal-content { background: white; width: 100%; position: absolute; bottom: 0; padding: 30px; border-radius: 25px 25px 0 0; text-align: center; }
+        textarea { width: 100%; height: 100px; margin: 15px 0; border: 1px solid #dbdbdb; border-radius: 10px; padding: 12px; font-size: 16px; outline: none; }
+        .btn-post { background: #0095f6; color: white; border: none; padding: 15px; border-radius: 10px; width: 100%; font-size: 16px; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
 
-    <header><h2>🏕️ SCOUT ROOM 24</h2></header>
+    <header><h1>🌲 SCOUT ROOM 24 🌲</h1></header>
     <div id="feed"></div>
 
     <button class="btn-open-modal" onclick="toggleModal(true)">+</button>
 
     <div id="postModal" class="modal">
         <div class="modal-content">
-            <h3 style="margin-top:0;">สร้างโพสต์ใหม่</h3>
-            <input type="file" id="imageInput" accept="image/*">
-            <textarea id="captionInput" placeholder="เขียนแคปชั่น..."></textarea>
-            <button class="btn-post" onclick="addNewPost()">แชร์โพสต์</button>
-            <button onclick="toggleModal(false)" style="margin-top:10px; background:none; border:none; color:red;">ยกเลิก</button>
+            <h3 style="margin-top:0;">📸 สร้างโพสต์ใหม่</h3>
+            <input type="file" id="imageInput" accept="image/*" style="margin-bottom:10px;">
+            <textarea id="captionInput" placeholder="พิมพ์ข้อความที่นี่..."></textarea>
+            <button class="btn-post" id="postBtn" onclick="addNewPost()">แชร์โพสต์</button>
+            <button onclick="toggleModal(false)" style="margin-top:15px; border:none; background:none; color:#999; cursor:pointer;">ยกเลิก</button>
         </div>
     </div>
 
@@ -48,7 +48,7 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 
     <script>
-        // 1. ตั้งค่า Firebase (ใช้ค่าของคุณ)
+        // 1. ตั้งค่า Firebase ของคุณ
         const firebaseConfig = {
             apiKey: "AIzaSyDQwpiCLNLu4DQrBawxvyYA62ATmAYYKRs",
             authDomain: "scoutroom24.firebaseapp.com",
@@ -65,7 +65,7 @@
             document.getElementById('postModal').style.display = show ? 'block' : 'none';
         }
 
-        // 2. ดึงข้อมูลโพสต์มาแสดง
+        // 2. ดึงข้อมูลแบบเรียลไทม์
         db.collection("posts").orderBy("timestamp", "desc").onSnapshot((snapshot) => {
             const feed = document.getElementById('feed');
             feed.innerHTML = ""; 
@@ -74,63 +74,63 @@
                 const postDiv = document.createElement('div');
                 postDiv.className = 'post';
                 postDiv.innerHTML = `
-                    <div style="padding:10px; font-weight:bold;">ลูกเสือห้อง 24</div>
-                    <img src="${data.imageUrl}">
-                    <div class="post-content"><p><b>เพื่อน:</b> ${data.caption || ''}</p></div>
+                    <div style="padding:12px; font-weight:600; font-size:14px;">👤 เพื่อนลูกเสือ 24</div>
+                    <img src="${data.imageUrl}" loading="lazy">
+                    <div class="post-content">
+                        <p style="margin:0; font-size:14px;">${data.caption || ''}</p>
+                    </div>
                 `;
                 feed.appendChild(postDiv);
             });
         });
 
-        // 3. ฟังก์ชันอัปโหลด (ใช้ ImgBB แทน Firebase Storage)
+        // 3. ฟังก์ชันอัปโหลด (ใช้ API Key ของคุณเองจะชัวร์ที่สุด)
         async function addNewPost() {
             const fileInput = document.getElementById('imageInput');
             const captionInput = document.getElementById('captionInput');
+            const postBtn = document.getElementById('postBtn');
             const file = fileInput.files[0];
 
-            if (!file) {
-                alert("กรุณาเลือกรูปก่อนนะครับ!");
-                return;
-            }
+            if (!file) return alert("เลือกรูปก่อนนะครับ!");
 
-            const btn = document.querySelector('.btn-post');
-            btn.innerText = "กำลังอัปโหลด...";
-            btn.disabled = true;
+            postBtn.innerText = "⏳ กำลังโพสต์...";
+            postBtn.disabled = true;
 
             try {
                 // อัปโหลดไป ImgBB
                 const formData = new FormData();
                 formData.append("image", file);
                 
-                const imgbbResponse = await fetch('https://api.imgbb.com/1/upload?key=5f84d6676f6259f972008f40778c1995', {
+                // *** สำคัญ: เปลี่ยน API Key ตรงนี้เป็นของคุณเอง ***
+                const apiKey = "953b0a985d91136a7dca903586d3f298"; 
+                
+                const response = await fetch(`https://api.imgbb.com/1/upload?key=${apiKey}`, {
                     method: 'POST',
                     body: formData
                 });
                 
-                const imgbbData = await imgbbResponse.json();
+                const result = await response.json();
                 
-                if (imgbbData.success) {
-                    const url = imgbbData.data.url;
-
+                if (result.success) {
                     // บันทึกลง Firestore
                     await db.collection("posts").add({
-                        imageUrl: url,
+                        imageUrl: result.data.url,
                         caption: captionInput.value,
                         timestamp: firebase.firestore.FieldValue.serverTimestamp()
                     });
 
+                    // สำเร็จแล้วเคลียร์ค่า
                     captionInput.value = '';
                     fileInput.value = '';
                     toggleModal(false);
                 } else {
-                    throw new Error("อัปโหลดรูปไม่สำเร็จ");
+                    throw new Error("ImgBB ตอบกลับว่าไม่สำเร็จ");
                 }
             } catch (error) {
                 alert("เกิดข้อผิดพลาด: " + error.message);
-                console.error(error);
             } finally {
-                btn.innerText = "แชร์โพสต์";
-                btn.disabled = false;
+                postBtn.innerText = "แชร์โพสต์";
+                postBtn.disabled = false;
             }
         }
     </script>
