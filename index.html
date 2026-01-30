@@ -1,70 +1,137 @@
-// --- ส่วนการตั้งค่า Firebase (เอามาจากหน้าเว็บ Firebase ของคุณ) ---
-const firebaseConfig = {
-  apiKey: "AIzaSyDQwpiCLNLu4DQrBawxvyYA62ATmAYYKRs",
-  authDomain: "scoutroom24.firebaseapp.com",
-  projectId: "scoutroom24",
-  storageBucket: "scoutroom24.firebasestorage.app",
-  messagingSenderId: "863717190356",
-  appId: "1:863717190356:web:ad6bf171a7dff9d808e941",
-  measurementId: "G-QNTS6Q643L"
-};
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Scout Room 24</title>
+    <style>
+        /* สไตล์หน้าเว็บแบบแอปมือถือ */
+        * { box-sizing: border-box; }
+        body { font-family: -apple-system, sans-serif; background-color: #ffffff; margin: 0; padding-bottom: 90px; color: #262626; }
+        header { background: #fff; padding: 10px; text-align: center; border-bottom: 1px solid #efefef; position: sticky; top: 0; z-index: 100; }
+        header h1 { font-size: 18px; margin: 0; color: #5d4037; }
+        #feed { width: 100%; max-width: 500px; margin: 0 auto; }
+        .post { border-bottom: 1px solid #efefef; margin-bottom: 10px; }
+        .post-header { padding: 12px; font-weight: 600; font-size: 14px; display: flex; align-items: center; }
+        .avatar { width: 30px; height: 30px; background: #ddd; border-radius: 50%; margin-right: 10px; }
+        .post img { width: 100%; height: auto; display: block; background: #f0f0f0; }
+        .post-content { padding: 12px; }
+        .post-caption { font-size: 14px; margin: 0; }
+        
+        /* ปุ่ม Post วงกลม */
+        .btn-open-modal {
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+            width: 60px; height: 60px; background: #2e7d32; color: white;
+            border-radius: 50%; border: none; font-size: 35px; cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2); z-index: 1000;
+        }
 
-// เริ่มใช้งาน Firebase
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
-const storage = firebase.storage();
+        /* Modal GUI */
+        .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); }
+        .modal-content { background: white; width: 100%; position: absolute; bottom: 0; padding: 25px; border-radius: 20px 20px 0 0; }
+        textarea { width: 100%; height: 100px; margin: 15px 0; border: 1px solid #dbdbdb; border-radius: 8px; padding: 12px; font-size: 16px; }
+        .btn-post { background: #0095f6; color: white; border: none; padding: 12px; border-radius: 8px; width: 100%; font-size: 16px; font-weight: bold; }
+        .btn-close { position: absolute; top: 15px; right: 20px; font-size: 24px; border: none; background: none; color: #999; }
+    </style>
+</head>
+<body>
 
-// 1. ฟังก์ชันดึงข้อมูลจาก Database มาแสดง (เชื่อมต่อทุกคน)
-db.collection("posts").orderBy("timestamp", "desc").onSnapshot((snapshot) => {
-    const feed = document.getElementById('feed');
-    feed.innerHTML = ""; // ล้างหน้าจอเพื่อโหลดใหม่
-    snapshot.forEach((doc) => {
-        const data = doc.data();
-        const postDiv = document.createElement('div');
-        postDiv.className = 'post';
-        postDiv.innerHTML = `
-            <div class="post-header"><div class="avatar"></div><span>ลูกเสือห้อง 24</span></div>
-            <img src="${data.imageUrl}">
-            <div class="post-content"><p class="post-caption"><b>เพื่อน</b> ${data.caption}</p></div>
-        `;
-        feed.appendChild(postDiv);
-    });
-});
+    <header><h1>🏕️ SCOUT ROOM 24</h1></header>
 
-// 2. ฟังก์ชันอัปโหลดรูปและบันทึกข้อมูล
-async function addNewPost() {
-    const fileInput = document.getElementById('imageInput');
-    const captionInput = document.getElementById('captionInput');
-    const file = fileInput.files[0];
+    <div id="feed">
+        </div>
 
-    if (!file) return alert("กรุณาเลือกรูป!");
+    <button class="btn-open-modal" onclick="toggleModal(true)">+</button>
 
-    // แสดงสถานะว่ากำลังโหลด
-    const btn = document.querySelector('.btn-post');
-    btn.innerText = "กำลังโพสต์...";
-    btn.disabled = true;
+    <div id="postModal" class="modal">
+        <div class="modal-content">
+            <button class="btn-close" onclick="toggleModal(false)">&times;</button>
+            <h3 style="margin: 0; text-align: center;">สร้างโพสต์ใหม่</h3>
+            <input type="file" id="imageInput" accept="image/*" style="margin-top:20px;">
+            <textarea id="captionInput" placeholder="เขียนแคปชั่น..."></textarea>
+            <button class="btn-post" onclick="addNewPost()">แชร์โพสต์</button>
+        </div>
+    </div>
 
-    try {
-        // อัปโหลดรูปไปที่ Firebase Storage
-        const storageRef = storage.ref('photos/' + file.name);
-        await storageRef.put(file);
-        const url = await storageRef.getDownloadURL();
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
 
-        // บันทึกข้อความและลิงก์รูปลง Firestore
-        await db.collection("posts").add({
-            imageUrl: url,
-            caption: captionInput.value,
-            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    <script>
+        // 1. ตั้งค่า Firebase (ใช้ค่าของคุณ)
+        const firebaseConfig = {
+            apiKey: "AIzaSyDQwpiCLNLu4DQrBawxvyYA62ATmAYYKRs",
+            authDomain: "scoutroom24.firebaseapp.com",
+            projectId: "scoutroom24",
+            storageBucket: "scoutroom24.firebasestorage.app",
+            messagingSenderId: "863717190356",
+            appId: "1:863717190356:web:ad6bf171a7dff9d808e941",
+            measurementId: "G-QNTS6Q643L"
+        };
+
+        // เริ่มใช้งาน
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const storage = firebase.storage();
+
+        // ฟังก์ชันเปิด-ปิดหน้าต่าง Post
+        function toggleModal(show) {
+            document.getElementById('postModal').style.display = show ? 'block' : 'none';
+        }
+
+        // 2. ดึงข้อมูลมาแสดง (Real-time)
+        db.collection("posts").orderBy("timestamp", "desc").onSnapshot((snapshot) => {
+            const feed = document.getElementById('feed');
+            feed.innerHTML = ""; 
+            snapshot.forEach((doc) => {
+                const data = doc.data();
+                const postDiv = document.createElement('div');
+                postDiv.className = 'post';
+                postDiv.innerHTML = `
+                    <div class="post-header"><div class="avatar"></div><span>ลูกเสือห้อง 24</span></div>
+                    <img src="${data.imageUrl}">
+                    <div class="post-content"><p class="post-caption"><b>เพื่อน:</b> ${data.caption || ''}</p></div>
+                `;
+                feed.appendChild(postDiv);
+            });
         });
 
-        // ล้างค่าและปิดหน้าต่าง
-        captionInput.value = '';
-        fileInput.value = '';
-        toggleModal(false);
-    } catch (error) {
-        alert("เกิดข้อผิดพลาด: " + error.message);
-    } finally {
-        btn.innerText = "แชร์โพสต์";
-        btn.disabled = false;
-    }
-}
+        // 3. ฟังก์ชันอัปโหลด
+        async function addNewPost() {
+            const fileInput = document.getElementById('imageInput');
+            const captionInput = document.getElementById('captionInput');
+            const file = fileInput.files[0];
+
+            if (!file) return alert("กรุณาเลือกรูป!");
+
+            const btn = document.querySelector('.btn-post');
+            btn.innerText = "กำลังโพสต์...";
+            btn.disabled = true;
+
+            try {
+                // อัปโหลดรูป (ใส่ Date.now เพื่อป้องกันชื่อซ้ำ)
+                const storageRef = storage.ref('photos/' + Date.now() + "_" + file.name);
+                await storageRef.put(file);
+                const url = await storageRef.getDownloadURL();
+
+                // บันทึกข้อมูล
+                await db.collection("posts").add({
+                    imageUrl: url,
+                    caption: captionInput.value,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                captionInput.value = '';
+                fileInput.value = '';
+                toggleModal(false);
+            } catch (error) {
+                alert("เกิดข้อผิดพลาด: " + error.message);
+                console.error(error);
+            } finally {
+                btn.innerText = "แชร์โพสต์";
+                btn.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>  
