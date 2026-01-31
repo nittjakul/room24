@@ -5,55 +5,32 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Scout Room 24 - Social</title>
     <style>
-        /* --- CSS: ออกแบบให้เหมือนแอปมือถือ --- */
+        /* --- CSS เดิมของคุณคงไว้ทั้งหมด --- */
         * { box-sizing: border-box; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #fafafa; margin: 0; padding-bottom: 90px; color: #262626; }
-        
-        header { 
-            background: #fff; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; 
-            border-bottom: 1px solid #dbdbdb; position: sticky; top: 0; z-index: 100; 
-        }
+        header { background: #fff; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #dbdbdb; position: sticky; top: 0; z-index: 100; }
         header h1 { font-size: 16px; margin: 0; color: #5d4037; font-weight: 800; }
         .user-name-display { font-size: 12px; color: #0095f6; cursor: pointer; font-weight: bold; background: #f0f9ff; padding: 5px 10px; border-radius: 15px; }
-
         #feed { width: 100%; max-width: 500px; margin: 0 auto; }
         .post { background: #fff; border-bottom: 1px solid #efefef; margin-bottom: 10px; position: relative; }
         .post-header { padding: 12px; display: flex; justify-content: space-between; align-items: center; }
         .post-user { font-weight: 600; font-size: 14px; display: flex; align-items: center; }
         .post-user::before { content: ""; width: 25px; height: 25px; background: #ddd; border-radius: 50%; margin-right: 8px; display: inline-block; }
         .post-menu { cursor: pointer; color: #999; padding: 5px; font-weight: bold; }
-        
         .post img { width: 100%; display: block; background: #f0f0f0; }
-        
         .post-actions { padding: 10px 12px; display: flex; gap: 15px; }
         .action-btn { cursor: pointer; font-size: 22px; background: none; border: none; padding: 0; transition: transform 0.1s; }
         .action-btn:active { transform: scale(1.2); }
-        
         .like-count { font-size: 14px; font-weight: 700; padding: 0 12px; margin-bottom: 5px; }
         .post-content { padding: 0 12px 10px; font-size: 14px; line-height: 1.4; }
-        
         .comment-section { padding: 8px 12px; border-top: 1px solid #fafafa; font-size: 13px; background: #fcfcfc; }
         .comment-item { margin-bottom: 4px; }
-        
         .comment-input-area { display: flex; padding: 10px 12px; border-top: 1px solid #efefef; }
         .comment-input { flex: 1; border: none; outline: none; font-size: 13px; background: transparent; }
-
-        /* ปุ่มโพสต์วงกลม */
-        .btn-open-modal { 
-            position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); 
-            width: 60px; height: 60px; background: #2e7d32; color: white; 
-            border-radius: 50%; border: none; font-size: 35px; cursor: pointer; 
-            z-index: 1000; box-shadow: 0 4px 15px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center;
-        }
-
-        /* Modal */
+        .btn-open-modal { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); width: 60px; height: 60px; background: #2e7d32; color: white; border-radius: 50%; border: none; font-size: 35px; cursor: pointer; z-index: 1000; box-shadow: 0 4px 15px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; }
         .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); }
-        .modal-content { 
-            background: white; width: 100%; position: absolute; bottom: 0; padding: 25px; 
-            border-radius: 20px 20px 0 0; animation: slideUp 0.3s ease-out; 
-        }
+        .modal-content { background: white; width: 100%; position: absolute; bottom: 0; padding: 25px; border-radius: 20px 20px 0 0; animation: slideUp 0.3s ease-out; }
         @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-        
         textarea { width: 100%; height: 90px; margin: 10px 0; border: 1px solid #dbdbdb; border-radius: 10px; padding: 12px; font-size: 16px; resize: none; outline: none; }
         .btn-post { background: #0095f6; color: white; border: none; padding: 14px; border-radius: 10px; width: 100%; font-weight: bold; font-size: 16px; cursor: pointer; }
         .btn-post:disabled { background: #b2dffc; }
@@ -89,7 +66,7 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 
     <script>
-        // --- 1. ตั้งค่า Firebase ---
+        // --- 1. ตั้งค่า Firebase (คงเดิม) ---
         const firebaseConfig = {
             apiKey: "AIzaSyDQwpiCLNLu4DQrBawxvyYA62ATmAYYKRs",
             authDomain: "scoutroom24.firebaseapp.com",
@@ -101,7 +78,7 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        // --- 2. ระบบชื่อผู้ใช้ (จำชื่อในเครื่อง) ---
+        // --- 2. ระบบชื่อผู้ใช้ (คงเดิม) ---
         let myName = localStorage.getItem("scoutUserName");
         if (!myName) {
             myName = prompt("ยินดีต้อนรับ! กรุณาตั้งชื่อเล่นของคุณ:") || "เพื่อนลูกเสือ";
@@ -118,7 +95,7 @@
             }
         }
 
-        // --- 3. การจัดการ Modal ---
+        // --- 3. การจัดการ Modal (คงเดิม) ---
         function toggleModal(id, show) {
             document.getElementById(id).style.display = show ? 'block' : 'none';
         }
@@ -126,12 +103,13 @@
         function openNewPostModal() {
             document.getElementById('editPostId').value = "";
             document.getElementById('captionInput').value = "";
+            document.getElementById('imageInput').value = "";
             document.getElementById('modalTitle').innerText = "สร้างโพสต์ใหม่";
             document.getElementById('fileArea').style.display = "block";
             toggleModal('postModal', true);
         }
 
-        // --- 4. ดึงข้อมูล Feed แบบ Real-time ---
+        // --- 4. ดึงข้อมูล Feed (คงเดิม) ---
         db.collection("posts").orderBy("timestamp", "desc").onSnapshot((snapshot) => {
             const feed = document.getElementById('feed');
             feed.innerHTML = "";
@@ -169,51 +147,55 @@
             });
         });
 
-        // --- 5. ระบบโพสต์รูป (ใช้ ImgBB) ---
+        // --- 5. ระบบโพสต์รูปใหม่ (ใช้ Vercel Blob) ---
         async function handlePostSubmit() {
             const editId = document.getElementById('editPostId').value;
             const caption = document.getElementById('captionInput').value;
             const btn = document.getElementById('postBtn');
 
             if (editId) {
-                // โหมดแก้ไข
                 await db.collection("posts").doc(editId).update({ caption: caption });
                 toggleModal('postModal', false);
             } else {
-                // โหมดสร้างใหม่
                 const fileInput = document.getElementById('imageInput');
                 const file = fileInput.files[0];
-                if (!file) return alert("กรุณาเลือกรูปภาพ!");
+                if (!file) return alert("กรุณาเลือกรูปภาพ");
 
                 btn.innerText = "⏳ กำลังอัปโหลด...";
                 btn.disabled = true;
 
                 try {
-                    const formData = new FormData();
-                    formData.append("image", file);
-                    // API Key สำรอง (ควรเปลี่ยนเป็นของตัวเองที่ imgbb.com)
-                    const res = await fetch('https://api.imgbb.com/1/upload?key=5f84d6676f6259f972008f40778c1995', { 
-                        method: 'POST', body: formData 
+                    // เปลี่ยนจาก ImgBB มาเรียก API ของเราเองบน Vercel
+                    const response = await fetch(`/api/upload?filename=${encodeURIComponent(file.name)}`, {
+                        method: 'POST',
+                        body: file,
                     });
-                    const result = await res.json();
+
+                    if(!response.ok) throw new Error("อัปโหลดไปยัง Vercel ไม่สำเร็จ");
                     
-                    if(result.success) {
-                        await db.collection("posts").add({
-                            imageUrl: result.data.url,
-                            caption: caption,
-                            userName: myName,
-                            likes: 0,
-                            comments: [],
-                            timestamp: firebase.firestore.FieldValue.serverTimestamp()
-                        });
-                        toggleModal('postModal', false);
-                    } else { alert("อัปโหลดไม่สำเร็จ!"); }
-                } catch (e) { alert("เกิดข้อผิดพลาด: " + e.message); }
-                btn.innerText = "แชร์โพสต์"; btn.disabled = false;
+                    const result = await response.json();
+                    
+                    // บันทึกลง Firebase Firestore เหมือนเดิม
+                    await db.collection("posts").add({
+                        imageUrl: result.url, // URL ที่ได้จาก Vercel Blob
+                        caption: caption,
+                        userName: myName,
+                        likes: 0,
+                        comments: [],
+                        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    
+                    toggleModal('postModal', false);
+                } catch (e) { 
+                    alert("เกิดข้อผิดพลาด: " + e.message); 
+                } finally {
+                    btn.innerText = "แชร์โพสต์"; 
+                    btn.disabled = false;
+                }
             }
         }
 
-        // --- 6. ระบบไลค์, คอมเมนต์, แก้ไข, ลบ ---
+        // --- 6. ระบบไลค์, คอมเมนต์, แก้ไข, ลบ (คงเดิม) ---
         async function likePost(id, currentLikes) {
             await db.collection("posts").doc(id).update({ likes: currentLikes + 1 });
         }
@@ -238,7 +220,7 @@
                 document.getElementById('editPostId').value = id;
                 document.getElementById('captionInput').value = currentCaption;
                 document.getElementById('modalTitle').innerText = "แก้ไขโพสต์";
-                document.getElementById('fileArea').style.display = "none"; // แก้ไขเฉพาะข้อความ
+                document.getElementById('fileArea').style.display = "none";
                 toggleModal('postModal', true);
             }
         }
