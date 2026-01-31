@@ -1,20 +1,20 @@
 import { put } from '@vercel/blob';
 
-export default async function handler(request) {
-  const { searchParams } = new URL(request.url);
-  const filename = searchParams.get('filename') || 'image.png';
+export default async function handler(request, response) {
+  if (request.method !== 'POST') {
+    return response.status(405).json({ error: 'Method not allowed' });
+  }
 
   try {
+    const filename = new URL(request.url, `http://${request.headers.host}`).searchParams.get('filename') || 'image.png';
+    
+    // อัปโหลดไฟล์
     const blob = await put(filename, request, {
       access: 'public',
     });
-    return new Response(JSON.stringify(blob), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' },
-    });
+
+    return response.status(200).json(blob);
   } catch (error) {
-    return new Response(JSON.stringify({ error: error.message }), { status: 500 });
+    return response.status(500).json({ error: error.message });
   }
 }
-
-export const config = { runtime: 'edge' };
