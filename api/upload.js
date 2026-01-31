@@ -4,7 +4,6 @@ export default async function handler(request) {
   const { searchParams } = new URL(request.url);
   const filename = searchParams.get('filename');
 
-  // สั่งบันทึกไฟล์ลง Vercel Blob
   const blob = await put(filename, request, {
     access: 'public',
   });
@@ -12,6 +11,4 @@ export default async function handler(request) {
   return Response.json(blob);
 }
 
-export const config = {
-  runtime: 'edge', // ใช้ Edge Runtime เพื่อความรวดเร็ว
-};
+export const config = { runtime: 'edge' };
