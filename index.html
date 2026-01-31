@@ -3,44 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Scout Room 24</title>
+    <title>Scout Room 24 Plus</title>
     <style>
-        /* CSS ปรับให้สวยเหมือนแอป */
         * { box-sizing: border-box; }
         body { font-family: -apple-system, sans-serif; background-color: #fafafa; margin: 0; padding-bottom: 90px; }
-        header { background: #fff; padding: 15px; text-align: center; border-bottom: 1px solid #dbdbdb; position: sticky; top: 0; z-index: 100; }
-        header h1 { font-size: 18px; margin: 0; color: #5d4037; }
+        header { background: #fff; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #dbdbdb; position: sticky; top: 0; z-index: 100; }
+        header h1 { font-size: 16px; margin: 0; color: #5d4037; }
+        .user-name-display { font-size: 12px; color: #0095f6; cursor: pointer; font-weight: bold; }
+
         #feed { width: 100%; max-width: 500px; margin: 0 auto; }
-        .post { background: #fff; border-bottom: 1px solid #efefef; margin-bottom: 15px; animation: fadeIn 0.5s; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        .post img { width: 100%; display: block; background: #eee; min-height: 200px; }
-        .post-content { padding: 15px; }
-        .btn-open-modal {
-            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
-            width: 65px; height: 65px; background: #2e7d32; color: white;
-            border-radius: 50%; border: none; font-size: 40px; cursor: pointer; z-index: 1000;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-        }
+        .post { background: #fff; border-bottom: 1px solid #efefef; margin-bottom: 10px; position: relative; }
+        .post-header { padding: 10px; display: flex; justify-content: space-between; align-items: center; }
+        .post-user { font-weight: 600; font-size: 14px; }
+        .post-menu { cursor: pointer; color: #999; }
+        .post img { width: 100%; display: block; }
+        
+        .post-actions { padding: 10px; display: flex; gap: 15px; }
+        .action-btn { cursor: pointer; font-size: 20px; background: none; border: none; padding: 0; }
+        .like-count { font-size: 14px; font-weight: 600; padding: 0 10px; }
+        
+        .post-content { padding: 5px 10px 10px; font-size: 14px; }
+        .comment-section { padding: 10px; border-top: 1px solid #fafafa; font-size: 13px; }
+        .comment-input-area { display: flex; padding: 10px; border-top: 1px solid #efefef; }
+        .comment-input { flex: 1; border: none; outline: none; font-size: 13px; }
+
+        .btn-open-modal { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); width: 60px; height: 60px; background: #2e7d32; color: white; border-radius: 50%; border: none; font-size: 35px; cursor: pointer; z-index: 1000; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
         .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); }
-        .modal-content { background: white; width: 100%; position: absolute; bottom: 0; padding: 30px; border-radius: 25px 25px 0 0; text-align: center; }
-        textarea { width: 100%; height: 100px; margin: 15px 0; border: 1px solid #dbdbdb; border-radius: 10px; padding: 12px; font-size: 16px; outline: none; }
-        .btn-post { background: #0095f6; color: white; border: none; padding: 15px; border-radius: 10px; width: 100%; font-size: 16px; font-weight: bold; cursor: pointer; }
+        .modal-content { background: white; width: 100%; position: absolute; bottom: 0; padding: 25px; border-radius: 20px 20px 0 0; }
+        textarea { width: 100%; height: 80px; margin: 10px 0; border: 1px solid #dbdbdb; border-radius: 8px; padding: 10px; }
+        .btn-post { background: #0095f6; color: white; border: none; padding: 12px; border-radius: 8px; width: 100%; font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <header><h1>🌲 SCOUT ROOM 24 🌲</h1></header>
+    <header>
+        <h1>🌲 SCOUT 24</h1>
+        <div class="user-name-display" onclick="changeName()">👤 <span id="currentUserName">Loading...</span></div>
+    </header>
+
     <div id="feed"></div>
 
-    <button class="btn-open-modal" onclick="toggleModal(true)">+</button>
+    <button class="btn-open-modal" onclick="toggleModal('postModal', true)">+</button>
 
     <div id="postModal" class="modal">
         <div class="modal-content">
-            <h3 style="margin-top:0;">📸 สร้างโพสต์ใหม่</h3>
-            <input type="file" id="imageInput" accept="image/*" style="margin-bottom:10px;">
-            <textarea id="captionInput" placeholder="พิมพ์ข้อความที่นี่..."></textarea>
-            <button class="btn-post" id="postBtn" onclick="addNewPost()">แชร์โพสต์</button>
-            <button onclick="toggleModal(false)" style="margin-top:15px; border:none; background:none; color:#999; cursor:pointer;">ยกเลิก</button>
+            <h3 id="modalTitle">สร้างโพสต์ใหม่</h3>
+            <input type="file" id="imageInput" accept="image/*">
+            <textarea id="captionInput" placeholder="เขียนแคปชั่น..."></textarea>
+            <input type="hidden" id="editPostId">
+            <button class="btn-post" id="postBtn" onclick="handlePostSubmit()">แชร์โพสต์</button>
+            <button onclick="toggleModal('postModal', false)" style="margin-top:10px; border:none; background:none; color:red; width:100%;">ยกเลิก</button>
         </div>
     </div>
 
@@ -48,7 +60,6 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 
     <script>
-        // 1. ตั้งค่า Firebase ของคุณ
         const firebaseConfig = {
             apiKey: "AIzaSyDQwpiCLNLu4DQrBawxvyYA62ATmAYYKRs",
             authDomain: "scoutroom24.firebaseapp.com",
@@ -57,81 +68,139 @@
             messagingSenderId: "863717190356",
             appId: "1:863717190356:web:ad6bf171a7dff9d808e941"
         };
-
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        function toggleModal(show) {
-            document.getElementById('postModal').style.display = show ? 'block' : 'none';
+        // --- ระบบจัดการชื่อ ---
+        let myName = localStorage.getItem("scoutUserName");
+        if (!myName) {
+            myName = prompt("ยินดีต้อนรับ! กรุณาตั้งชื่อเล่นของคุณ:") || "ลูกเสือไร้นาม";
+            localStorage.setItem("scoutUserName", myName);
+        }
+        document.getElementById("currentUserName").innerText = myName;
+
+        function changeName() {
+            let newName = prompt("เปลี่ยนชื่อเล่นของคุณ:", myName);
+            if (newName) {
+                myName = newName;
+                localStorage.setItem("scoutUserName", myName);
+                document.getElementById("currentUserName").innerText = myName;
+            }
         }
 
-        // 2. ดึงข้อมูลแบบเรียลไทม์
+        function toggleModal(id, show) {
+            document.getElementById(id).style.display = show ? 'block' : 'none';
+            if (!show) { // Reset values
+                document.getElementById('editPostId').value = "";
+                document.getElementById('modalTitle').innerText = "สร้างโพสต์ใหม่";
+                document.getElementById('imageInput').style.display = "block";
+            }
+        }
+
+        // --- ระบบแสดงผล Feed ---
         db.collection("posts").orderBy("timestamp", "desc").onSnapshot((snapshot) => {
             const feed = document.getElementById('feed');
-            feed.innerHTML = ""; 
+            feed.innerHTML = "";
             snapshot.forEach((doc) => {
-                const data = doc.data();
+                const post = doc.data();
+                const id = doc.id;
                 const postDiv = document.createElement('div');
                 postDiv.className = 'post';
+                
+                // เช็คว่าเป็นโพสต์ของเราไหม (เพื่อแสดงปุ่ม แก้ไข/ลบ)
+                const isMyPost = post.userName === myName;
+                const menuHtml = isMyPost ? `
+                    <div class="post-menu" onclick="showPostOptions('${id}', '${post.caption}')">⋮</div>
+                ` : '';
+
                 postDiv.innerHTML = `
-                    <div style="padding:12px; font-weight:600; font-size:14px;">👤 เพื่อนลูกเสือ 24</div>
-                    <img src="${data.imageUrl}" loading="lazy">
-                    <div class="post-content">
-                        <p style="margin:0; font-size:14px;">${data.caption || ''}</p>
+                    <div class="post-header">
+                        <span class="post-user">${post.userName || 'ลูกเสือ 24'}</span>
+                        ${menuHtml}
+                    </div>
+                    <img src="${post.imageUrl}" loading="lazy">
+                    <div class="post-actions">
+                        <button class="action-btn" onclick="likePost('${id}', ${post.likes || 0})">❤️</button>
+                    </div>
+                    <div class="like-count">${post.likes || 0} ถูกใจ</div>
+                    <div class="post-content"><b>${post.userName}</b> ${post.caption || ''}</div>
+                    <div class="comment-section" id="comments-${id}">
+                        ${(post.comments || []).map(c => `<div><b>${c.user}:</b> ${c.text}</div>`).join('')}
+                    </div>
+                    <div class="comment-input-area">
+                        <input type="text" class="comment-input" id="input-${id}" placeholder="เพิ่มคอมเมนต์...">
+                        <button style="border:none; background:none; color:#0095f6; font-weight:bold;" onclick="addComment('${id}')">โพสต์</button>
                     </div>
                 `;
                 feed.appendChild(postDiv);
             });
         });
 
-        // 3. ฟังก์ชันอัปโหลด (ใช้ API Key ของคุณเองจะชัวร์ที่สุด)
-        async function addNewPost() {
-            const fileInput = document.getElementById('imageInput');
-            const captionInput = document.getElementById('captionInput');
-            const postBtn = document.getElementById('postBtn');
-            const file = fileInput.files[0];
-
-            if (!file) return alert("เลือกรูปก่อนนะครับ!");
-
-            postBtn.innerText = "⏳ กำลังโพสต์...";
-            postBtn.disabled = true;
-
-            try {
-                // อัปโหลดไป ImgBB
-                const formData = new FormData();
-                formData.append("image", file);
+        // --- ระบบจัดการโพสต์ ---
+        async function handlePostSubmit() {
+            const editId = document.getElementById('editPostId').value;
+            const caption = document.getElementById('captionInput').value;
+            
+            if (editId) {
+                // แก้ไขโพสต์
+                await db.collection("posts").doc(editId).update({ caption: caption });
+                toggleModal('postModal', false);
+            } else {
+                // สร้างโพสต์ใหม่ (เหมือนเดิม)
+                const fileInput = document.getElementById('imageInput');
+                if (!fileInput.files[0]) return alert("เลือกรูปก่อนครับ");
                 
-                // *** สำคัญ: เปลี่ยน API Key ตรงนี้เป็นของคุณเอง ***
-                const apiKey = "953b0a985d91136a7dca903586d3f298"; 
-                
-                const response = await fetch(`https://api.imgbb.com/1/upload?key=${apiKey}`, {
-                    method: 'POST',
-                    body: formData
-                });
-                
-                const result = await response.json();
-                
-                if (result.success) {
-                    // บันทึกลง Firestore
-                    await db.collection("posts").add({
-                        imageUrl: result.data.url,
-                        caption: captionInput.value,
-                        timestamp: firebase.firestore.FieldValue.serverTimestamp()
-                    });
+                const btn = document.getElementById('postBtn');
+                btn.innerText = "⏳ กำลังอัปโหลด...";
+                btn.disabled = true;
 
-                    // สำเร็จแล้วเคลียร์ค่า
-                    captionInput.value = '';
-                    fileInput.value = '';
-                    toggleModal(false);
-                } else {
-                    throw new Error("ImgBB ตอบกลับว่าไม่สำเร็จ");
-                }
-            } catch (error) {
-                alert("เกิดข้อผิดพลาด: " + error.message);
-            } finally {
-                postBtn.innerText = "แชร์โพสต์";
-                postBtn.disabled = false;
+                try {
+                    const formData = new FormData();
+                    formData.append("image", fileInput.files[0]);
+                    const res = await fetch('https://api.imgbb.com/1/upload?key=5f84d6676f6259f972008f40778c1995', { method: 'POST', body: formData });
+                    const result = await res.json();
+                    
+                    if(result.success) {
+                        await db.collection("posts").add({
+                            imageUrl: result.data.url,
+                            caption: caption,
+                            userName: myName,
+                            likes: 0,
+                            comments: [],
+                            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+                        toggleModal('postModal', false);
+                    }
+                } catch (e) { alert("Error: " + e.message); }
+                btn.innerText = "แชร์โพสต์"; btn.disabled = false;
             }
+        }
+
+        function showPostOptions(id, currentCaption) {
+            const action = prompt("พิมพ์ 'edit' เพื่อแก้ไข หรือ 'delete' เพื่อลบโพสต์นี้:");
+            if (action === 'delete') {
+                if(confirm("ยืนยันการลบโพสต์?")) db.collection("posts").doc(id).delete();
+            } else if (action === 'edit') {
+                document.getElementById('editPostId').value = id;
+                document.getElementById('captionInput').value = currentCaption;
+                document.getElementById('modalTitle').innerText = "แก้ไขแคปชั่น";
+                document.getElementById('imageInput').style.display = "none";
+                toggleModal('postModal', true);
+            }
+        }
+
+        async function likePost(id, currentLikes) {
+            await db.collection("posts").doc(id).update({ likes: currentLikes + 1 });
+        }
+
+        async function addComment(id) {
+            const input = document.getElementById(`input-${id}`);
+            if (!input.value) return;
+            const commentObj = { user: myName, text: input.value };
+            await db.collection("posts").doc(id).update({
+                comments: firebase.firestore.FieldValue.arrayUnion(commentObj)
+            });
+            input.value = "";
         }
     </script>
 </body>
