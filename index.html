@@ -3,56 +3,85 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Scout Room 24 Plus</title>
+    <title>Scout Room 24 - Social</title>
     <style>
+        /* --- CSS: ออกแบบให้เหมือนแอปมือถือ --- */
         * { box-sizing: border-box; }
-        body { font-family: -apple-system, sans-serif; background-color: #fafafa; margin: 0; padding-bottom: 90px; }
-        header { background: #fff; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #dbdbdb; position: sticky; top: 0; z-index: 100; }
-        header h1 { font-size: 16px; margin: 0; color: #5d4037; }
-        .user-name-display { font-size: 12px; color: #0095f6; cursor: pointer; font-weight: bold; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #fafafa; margin: 0; padding-bottom: 90px; color: #262626; }
+        
+        header { 
+            background: #fff; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; 
+            border-bottom: 1px solid #dbdbdb; position: sticky; top: 0; z-index: 100; 
+        }
+        header h1 { font-size: 16px; margin: 0; color: #5d4037; font-weight: 800; }
+        .user-name-display { font-size: 12px; color: #0095f6; cursor: pointer; font-weight: bold; background: #f0f9ff; padding: 5px 10px; border-radius: 15px; }
 
         #feed { width: 100%; max-width: 500px; margin: 0 auto; }
         .post { background: #fff; border-bottom: 1px solid #efefef; margin-bottom: 10px; position: relative; }
-        .post-header { padding: 10px; display: flex; justify-content: space-between; align-items: center; }
-        .post-user { font-weight: 600; font-size: 14px; }
-        .post-menu { cursor: pointer; color: #999; }
-        .post img { width: 100%; display: block; }
+        .post-header { padding: 12px; display: flex; justify-content: space-between; align-items: center; }
+        .post-user { font-weight: 600; font-size: 14px; display: flex; align-items: center; }
+        .post-user::before { content: ""; width: 25px; height: 25px; background: #ddd; border-radius: 50%; margin-right: 8px; display: inline-block; }
+        .post-menu { cursor: pointer; color: #999; padding: 5px; font-weight: bold; }
         
-        .post-actions { padding: 10px; display: flex; gap: 15px; }
-        .action-btn { cursor: pointer; font-size: 20px; background: none; border: none; padding: 0; }
-        .like-count { font-size: 14px; font-weight: 600; padding: 0 10px; }
+        .post img { width: 100%; display: block; background: #f0f0f0; }
         
-        .post-content { padding: 5px 10px 10px; font-size: 14px; }
-        .comment-section { padding: 10px; border-top: 1px solid #fafafa; font-size: 13px; }
-        .comment-input-area { display: flex; padding: 10px; border-top: 1px solid #efefef; }
-        .comment-input { flex: 1; border: none; outline: none; font-size: 13px; }
+        .post-actions { padding: 10px 12px; display: flex; gap: 15px; }
+        .action-btn { cursor: pointer; font-size: 22px; background: none; border: none; padding: 0; transition: transform 0.1s; }
+        .action-btn:active { transform: scale(1.2); }
+        
+        .like-count { font-size: 14px; font-weight: 700; padding: 0 12px; margin-bottom: 5px; }
+        .post-content { padding: 0 12px 10px; font-size: 14px; line-height: 1.4; }
+        
+        .comment-section { padding: 8px 12px; border-top: 1px solid #fafafa; font-size: 13px; background: #fcfcfc; }
+        .comment-item { margin-bottom: 4px; }
+        
+        .comment-input-area { display: flex; padding: 10px 12px; border-top: 1px solid #efefef; }
+        .comment-input { flex: 1; border: none; outline: none; font-size: 13px; background: transparent; }
 
-        .btn-open-modal { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); width: 60px; height: 60px; background: #2e7d32; color: white; border-radius: 50%; border: none; font-size: 35px; cursor: pointer; z-index: 1000; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
-        .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); }
-        .modal-content { background: white; width: 100%; position: absolute; bottom: 0; padding: 25px; border-radius: 20px 20px 0 0; }
-        textarea { width: 100%; height: 80px; margin: 10px 0; border: 1px solid #dbdbdb; border-radius: 8px; padding: 10px; }
-        .btn-post { background: #0095f6; color: white; border: none; padding: 12px; border-radius: 8px; width: 100%; font-weight: bold; }
+        /* ปุ่มโพสต์วงกลม */
+        .btn-open-modal { 
+            position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); 
+            width: 60px; height: 60px; background: #2e7d32; color: white; 
+            border-radius: 50%; border: none; font-size: 35px; cursor: pointer; 
+            z-index: 1000; box-shadow: 0 4px 15px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center;
+        }
+
+        /* Modal */
+        .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); }
+        .modal-content { 
+            background: white; width: 100%; position: absolute; bottom: 0; padding: 25px; 
+            border-radius: 20px 20px 0 0; animation: slideUp 0.3s ease-out; 
+        }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        
+        textarea { width: 100%; height: 90px; margin: 10px 0; border: 1px solid #dbdbdb; border-radius: 10px; padding: 12px; font-size: 16px; resize: none; outline: none; }
+        .btn-post { background: #0095f6; color: white; border: none; padding: 14px; border-radius: 10px; width: 100%; font-weight: bold; font-size: 16px; cursor: pointer; }
+        .btn-post:disabled { background: #b2dffc; }
     </style>
 </head>
 <body>
 
     <header>
-        <h1>🌲 SCOUT 24</h1>
-        <div class="user-name-display" onclick="changeName()">👤 <span id="currentUserName">Loading...</span></div>
+        <h1>🏕️ SCOUT ROOM 24</h1>
+        <div class="user-name-display" onclick="changeName()">👤 <span id="currentUserName">กำลังโหลด...</span></div>
     </header>
 
-    <div id="feed"></div>
+    <div id="feed">
+        <p style="text-align:center; color:#999; margin-top:50px;">กำลังโหลดโพสต์จากเพื่อนๆ...</p>
+    </div>
 
-    <button class="btn-open-modal" onclick="toggleModal('postModal', true)">+</button>
+    <button class="btn-open-modal" onclick="openNewPostModal()">+</button>
 
     <div id="postModal" class="modal">
         <div class="modal-content">
-            <h3 id="modalTitle">สร้างโพสต์ใหม่</h3>
-            <input type="file" id="imageInput" accept="image/*">
-            <textarea id="captionInput" placeholder="เขียนแคปชั่น..."></textarea>
+            <h3 id="modalTitle" style="margin-top:0; text-align:center;">สร้างโพสต์ใหม่</h3>
+            <div id="fileArea">
+                <input type="file" id="imageInput" accept="image/*" style="margin-bottom:15px; width:100%;">
+            </div>
+            <textarea id="captionInput" placeholder="เขียนแคปชั่นที่นี่..."></textarea>
             <input type="hidden" id="editPostId">
             <button class="btn-post" id="postBtn" onclick="handlePostSubmit()">แชร์โพสต์</button>
-            <button onclick="toggleModal('postModal', false)" style="margin-top:10px; border:none; background:none; color:red; width:100%;">ยกเลิก</button>
+            <button onclick="toggleModal('postModal', false)" style="margin-top:15px; border:none; background:none; color:#ed4956; width:100%; font-weight:bold; cursor:pointer;">ยกเลิก</button>
         </div>
     </div>
 
@@ -60,6 +89,7 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 
     <script>
+        // --- 1. ตั้งค่า Firebase ---
         const firebaseConfig = {
             apiKey: "AIzaSyDQwpiCLNLu4DQrBawxvyYA62ATmAYYKRs",
             authDomain: "scoutroom24.firebaseapp.com",
@@ -71,52 +101,55 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        // --- ระบบจัดการชื่อ ---
+        // --- 2. ระบบชื่อผู้ใช้ (จำชื่อในเครื่อง) ---
         let myName = localStorage.getItem("scoutUserName");
         if (!myName) {
-            myName = prompt("ยินดีต้อนรับ! กรุณาตั้งชื่อเล่นของคุณ:") || "ลูกเสือไร้นาม";
+            myName = prompt("ยินดีต้อนรับ! กรุณาตั้งชื่อเล่นของคุณ:") || "เพื่อนลูกเสือ";
             localStorage.setItem("scoutUserName", myName);
         }
         document.getElementById("currentUserName").innerText = myName;
 
         function changeName() {
             let newName = prompt("เปลี่ยนชื่อเล่นของคุณ:", myName);
-            if (newName) {
+            if (newName && newName.trim() !== "") {
                 myName = newName;
                 localStorage.setItem("scoutUserName", myName);
                 document.getElementById("currentUserName").innerText = myName;
             }
         }
 
+        // --- 3. การจัดการ Modal ---
         function toggleModal(id, show) {
             document.getElementById(id).style.display = show ? 'block' : 'none';
-            if (!show) { // Reset values
-                document.getElementById('editPostId').value = "";
-                document.getElementById('modalTitle').innerText = "สร้างโพสต์ใหม่";
-                document.getElementById('imageInput').style.display = "block";
-            }
         }
 
-        // --- ระบบแสดงผล Feed ---
+        function openNewPostModal() {
+            document.getElementById('editPostId').value = "";
+            document.getElementById('captionInput').value = "";
+            document.getElementById('modalTitle').innerText = "สร้างโพสต์ใหม่";
+            document.getElementById('fileArea').style.display = "block";
+            toggleModal('postModal', true);
+        }
+
+        // --- 4. ดึงข้อมูล Feed แบบ Real-time ---
         db.collection("posts").orderBy("timestamp", "desc").onSnapshot((snapshot) => {
             const feed = document.getElementById('feed');
             feed.innerHTML = "";
+            if (snapshot.empty) {
+                feed.innerHTML = '<p style="text-align:center; color:#999; margin-top:50px;">ยังไม่มีโพสต์เลย เป็นคนแรกที่โพสต์สิ!</p>';
+                return;
+            }
             snapshot.forEach((doc) => {
                 const post = doc.data();
                 const id = doc.id;
+                const isMyPost = post.userName === myName;
+                
                 const postDiv = document.createElement('div');
                 postDiv.className = 'post';
-                
-                // เช็คว่าเป็นโพสต์ของเราไหม (เพื่อแสดงปุ่ม แก้ไข/ลบ)
-                const isMyPost = post.userName === myName;
-                const menuHtml = isMyPost ? `
-                    <div class="post-menu" onclick="showPostOptions('${id}', '${post.caption}')">⋮</div>
-                ` : '';
-
                 postDiv.innerHTML = `
                     <div class="post-header">
-                        <span class="post-user">${post.userName || 'ลูกเสือ 24'}</span>
-                        ${menuHtml}
+                        <span class="post-user">${post.userName}</span>
+                        ${isMyPost ? `<div class="post-menu" onclick="showOptions('${id}', '${post.caption}')">⋮</div>` : ''}
                     </div>
                     <img src="${post.imageUrl}" loading="lazy">
                     <div class="post-actions">
@@ -124,40 +157,44 @@
                     </div>
                     <div class="like-count">${post.likes || 0} ถูกใจ</div>
                     <div class="post-content"><b>${post.userName}</b> ${post.caption || ''}</div>
-                    <div class="comment-section" id="comments-${id}">
-                        ${(post.comments || []).map(c => `<div><b>${c.user}:</b> ${c.text}</div>`).join('')}
+                    <div class="comment-section">
+                        ${(post.comments || []).map(c => `<div class="comment-item"><b>${c.user}</b> ${c.text}</div>`).join('')}
                     </div>
                     <div class="comment-input-area">
                         <input type="text" class="comment-input" id="input-${id}" placeholder="เพิ่มคอมเมนต์...">
-                        <button style="border:none; background:none; color:#0095f6; font-weight:bold;" onclick="addComment('${id}')">โพสต์</button>
+                        <button style="border:none; background:none; color:#0095f6; font-weight:bold; cursor:pointer;" onclick="addComment('${id}')">โพสต์</button>
                     </div>
                 `;
                 feed.appendChild(postDiv);
             });
         });
 
-        // --- ระบบจัดการโพสต์ ---
+        // --- 5. ระบบโพสต์รูป (ใช้ ImgBB) ---
         async function handlePostSubmit() {
             const editId = document.getElementById('editPostId').value;
             const caption = document.getElementById('captionInput').value;
-            
+            const btn = document.getElementById('postBtn');
+
             if (editId) {
-                // แก้ไขโพสต์
+                // โหมดแก้ไข
                 await db.collection("posts").doc(editId).update({ caption: caption });
                 toggleModal('postModal', false);
             } else {
-                // สร้างโพสต์ใหม่ (เหมือนเดิม)
+                // โหมดสร้างใหม่
                 const fileInput = document.getElementById('imageInput');
-                if (!fileInput.files[0]) return alert("เลือกรูปก่อนครับ");
-                
-                const btn = document.getElementById('postBtn');
+                const file = fileInput.files[0];
+                if (!file) return alert("กรุณาเลือกรูปภาพ!");
+
                 btn.innerText = "⏳ กำลังอัปโหลด...";
                 btn.disabled = true;
 
                 try {
                     const formData = new FormData();
-                    formData.append("image", fileInput.files[0]);
-                    const res = await fetch('https://api.imgbb.com/1/upload?key=953b0a985d91136a7dca903586d3f298', { method: 'POST', body: formData });
+                    formData.append("image", file);
+                    // API Key สำรอง (ควรเปลี่ยนเป็นของตัวเองที่ imgbb.com)
+                    const res = await fetch('https://api.imgbb.com/1/upload?key=5f84d6676f6259f972008f40778c1995', { 
+                        method: 'POST', body: formData 
+                    });
                     const result = await res.json();
                     
                     if(result.success) {
@@ -170,39 +207,41 @@
                             timestamp: firebase.firestore.FieldValue.serverTimestamp()
                         });
                         toggleModal('postModal', false);
-                    }
-                } catch (e) { alert("Error: " + e.message); }
+                    } else { alert("อัปโหลดไม่สำเร็จ!"); }
+                } catch (e) { alert("เกิดข้อผิดพลาด: " + e.message); }
                 btn.innerText = "แชร์โพสต์"; btn.disabled = false;
             }
         }
 
-        function showPostOptions(id, currentCaption) {
-            const action = prompt("พิมพ์ 'edit' เพื่อแก้ไข หรือ 'delete' เพื่อลบโพสต์นี้:");
-            if (action === 'delete') {
-                if(confirm("ยืนยันการลบโพสต์?")) db.collection("posts").doc(id).delete();
-            } else if (action === 'edit') {
-                document.getElementById('editPostId').value = id;
-                document.getElementById('captionInput').value = currentCaption;
-                document.getElementById('modalTitle').innerText = "แก้ไขแคปชั่น";
-                document.getElementById('imageInput').style.display = "none";
-                toggleModal('postModal', true);
-            }
-        }
-
+        // --- 6. ระบบไลค์, คอมเมนต์, แก้ไข, ลบ ---
         async function likePost(id, currentLikes) {
             await db.collection("posts").doc(id).update({ likes: currentLikes + 1 });
         }
 
         async function addComment(id) {
             const input = document.getElementById(`input-${id}`);
-            if (!input.value) return;
+            if (!input.value.trim()) return;
             const commentObj = { user: myName, text: input.value };
             await db.collection("posts").doc(id).update({
                 comments: firebase.firestore.FieldValue.arrayUnion(commentObj)
             });
             input.value = "";
         }
+
+        function showOptions(id, currentCaption) {
+            const action = prompt("พิมพ์ 'edit' เพื่อแก้ไขแคปชั่น หรือ 'delete' เพื่อลบโพสต์:");
+            if (action === 'delete') {
+                if(confirm("คุณต้องการลบโพสต์นี้ใช่หรือไม่?")) {
+                    db.collection("posts").doc(id).delete();
+                }
+            } else if (action === 'edit') {
+                document.getElementById('editPostId').value = id;
+                document.getElementById('captionInput').value = currentCaption;
+                document.getElementById('modalTitle').innerText = "แก้ไขโพสต์";
+                document.getElementById('fileArea').style.display = "none"; // แก้ไขเฉพาะข้อความ
+                toggleModal('postModal', true);
+            }
+        }
     </script>
 </body>
 </html>
-
